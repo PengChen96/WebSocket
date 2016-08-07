@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script>
+			var ws = new WebSocket("ws://192.168.1.107:1235");
+			ws.onopen = function(){
+			    console.log("open");
+//			    alert("open");
+			};
+			ws.onmessage = function(e){
+				console.log("message");
+				alert(e.data);
+			}
+			ws.onerror = function(){
+			    console.log("error");
+			};
+			function send(){
+                var msg = {
+                    message: "mess",
+                    name: "name"
+                };
+                try{  
+                    ws.send(JSON.stringify(msg)); 
+                } catch(ex) {  
+                    console.log(ex);
+                }  
+            }
+		</script>
+		<input type="button" value="send" onclick="send()">
+	</body>
+</html>
