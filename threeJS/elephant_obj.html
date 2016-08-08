@@ -1,119 +1,131 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>loadObj</title>
-    <style>
-        #container{
-            width:99%;
-            height:99%;
-            position:absolute;
-            top:0px;
-            left:0px;
-            z-index:-1;
-        }
-    </style>
-    <script src="../js/threeJS/three.js"></script>
-    <script src="../js/threeJS/OBJLoader.js"></script>
-</head>
+	<head lang="en">
+		<meta charset="UTF-8">
+		<title>loadObj</title>
+		<style>
+			#container {
+				width: 99%;
+				height: 99%;
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				z-index: -1;
+			}
+		</style>
+		<script src="../js/threeJS/three.js"></script>
+		<script src="../js/threeJS/OBJLoader.js"></script>
+	</head>
+	<body>
+		<div id="container"></div>
+		<input type="button" value="←" onclick="left()" />
+		<input type="button" value="→" onclick="right()" />
+		<input type="button" value="↑" onclick="up()" />
+		<input type="button" value="↓" onclick="down()" />
+		<script>
+			
+		</script>
+		<script>
+			var container;
+			var camera, scene, renderer, light;
+			var α = 0,
+				β = 0;
+			var mouseX = 0,
+				mouseY = 0,
+				mouseZ = 0;
+			//初始化
+			init();
+			function init_renderer() {
+				container = document.getElementById("container")
+				width = document.getElementById("container").clientWidth;
+				height = document.getElementById("container").clientHeight;
+				//渲染器
+				renderer = new THREE.WebGLRenderer();
+				//        renderer.setPixelRatio( window.devicePixelRatio );
+				renderer = new THREE.WebGLRenderer({ //生成渲染对象
+					antialias: true //去锯齿
+				});
+				renderer.setSize(width, height);
+				container.appendChild(renderer.domElement);
+				renderer.setClearColor(0xEEEEEE, 1); //设置渲染的颜色；
+			}
+			function init_scene() {
+				// 场景
+				scene = new THREE.Scene();
+			}
+			function init_camera() {
+				//相机
+				camera = new THREE.PerspectiveCamera(45, width / height, 1, 2000);
+				camera.position.x = 0
+				camera.position.y = 0;
+				camera.position.z = 50;
+			}
+			function init_light() {
+				//光源
+				light = new THREE.DirectionalLight(0xffffff, 1);
+				light.position.set(0, 0, 1);
+				scene.add(light);
+			}
+			function init_texture() {
+				// texture
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function(item, loaded, total) {
+					console.log(item, loaded, total);
+				};
+				var texture = new THREE.Texture();
+				var loader = new THREE.ImageLoader(manager);
+				loader.load('../obj/larderite.png', function(image) {
+					texture.image = image;
+					texture.needsUpdate = true;
+				});
+				var onProgress = function(xhr) {
+					if(xhr.lengthComputable) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+					}
+				};
+				var onError = function(xhr) {};
+				var loader = new THREE.OBJLoader(manager);
+				loader.load('../obj/elephant.obj', function(object) {
+					object.traverse(function(child) {
+						if(child instanceof THREE.Mesh) {
+							child.material.map = texture;
+						}
+					});
+					scene.add(object);
+				}, onProgress, onError);
+			}
 
-<body>
-<div id="container"></div>
-<input type="button" value="←" onclick="left()"/>
-<input type="button" value="→" onclick="right()"/>
-<input type="button" value="↑" onclick="up()"/>
-<input type="button" value="↓" onclick="down()"/>
-<script>
-    var container;
-    var camera, scene, renderer;
-    var directionalLight;
-    var α = 0,β = 0;
-    var mouseX = 0, mouseY = 0, mouseZ = 0;
-    var len;
-    init();
-    animate();
-    function init() {
-        container = document.getElementById("container")
-        width = document.getElementById("container").clientWidth;
-        height = document.getElementById("container").clientHeight;
-        //渲染器
-        renderer = new THREE.WebGLRenderer();
-//        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer = new THREE.WebGLRenderer({    //生成渲染对象
-            antialias : true    //去锯齿
-        });
-        renderer.setSize( width, height );
-        container.appendChild( renderer.domElement );
-        renderer.setClearColor(0xEEEEEE,1);//设置渲染的颜色；
-        //相机
-        camera = new THREE.PerspectiveCamera( 45, width/ height, 1, 2000 );
-        camera.position.x = 0
-        camera.position.y = 0;
-        camera.position.z = 50;
+			function right() {
+				α = α + 0.25 * 3.14;
+			}
+			function left() {
+				α = α - 0.25 * 3.14;
+			}
+			function up() {
+				β = β + 0.25 * 3.14;
+			}
+			function down() {
+				β = β - 0.25 * 3.14;
+			}
 
-        // 场景
-        scene = new THREE.Scene();
-        //光源
-//        var ambient = new THREE.AmbientLight( 0x101030 );
-//        scene.add( ambient );
-        directionalLight = new THREE.DirectionalLight( 0xffffff,1);
-        directionalLight.position.set( 0, 0, 1 );
-        scene.add( directionalLight );
+			function init() {
+				init_renderer(); //渲染
+				init_scene(); //场景
+				init_camera(); //相机
+				init_light(); //光源
+				init_texture(); //物体
+				render();
+			}
+			function render() {
+				camera.position.x = mouseX = 50 * Math.cos(β) * Math.sin(α);
+				camera.position.y = mouseY = 50 * Math.sin(β);
+				camera.position.z = mouseZ = 50 * Math.cos(β) * Math.cos(α);
+				//      light.position.set( mouseX, mouseY, mouseZ);	//设置光源就在camera的位置
+				camera.lookAt(scene.position);
+				renderer.render(scene, camera);
+				requestAnimationFrame(render);
+			}
+		</script>
+	</body>
 
-        // texture
-        var manager = new THREE.LoadingManager();
-        manager.onProgress = function ( item, loaded, total ) {
-            console.log( item, loaded, total );
-        };
-        var texture = new THREE.Texture();
-
-        var loader = new THREE.ImageLoader( manager );
-        loader.load( '../obj/larderite.png', function ( image ) {
-            texture.image = image;
-            texture.needsUpdate = true;
-        } );
-        var onProgress = function(xhr) {
-            if (xhr.lengthComputable) {
-                var percentComplete = xhr.loaded / xhr.total * 100;
-            }
-        };
-        var onError = function(xhr) {};
-        var loader = new THREE.OBJLoader(manager);
-        loader.load('../obj/elephant.obj',function(object) {
-            object.traverse( function ( child ) {
-                if ( child instanceof THREE.Mesh ) {
-                    child.material.map = texture;
-                }
-            } );
-            scene.add(object);
-        }, onProgress, onError);
-    }
-
-	function right(){
-		α = α + 0.25*3.14;
-	}
-	function left(){
-		α = α - 0.25*3.14;
-	}
-	function up(){
-		β = β + 0.25*3.14;
-	}
-	function down(){
-		β = β - 0.25*3.14;
-	}
-    //
-    function animate() {
-        requestAnimationFrame( animate );
-        render();
-    }
-    function render() {
-        camera.position.x = mouseX = 50*Math.cos(β)*Math.sin(α);
-        camera.position.y = mouseY = 50*Math.sin(β);
-        camera.position.z = mouseZ = 50*Math.cos(β)*Math.cos(α);
-//      directionalLight.position.set( mouseX, mouseY, mouseZ);	//设置光源就在camera的位置
-        camera.lookAt( scene.position );
-        renderer.render( scene, camera );
-    }
-</script>
-</body>
 </html>
