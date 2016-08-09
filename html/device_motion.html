@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			p{
+				font-size: 36px;
+			}
+		</style>
+	</head>
+	<body>
+		<p>alpha：<span id="alpha">0</span></p>  
+        <p>beta：<span id="beta">0</span></p>  
+        <p>gamma：<span id="gamma">0</span></p>  
+        <p>指北针指向：<span id="heading">0</span>度</p>  
+        <p>指北针精度：<span id="accuracy">0</span>度</p> 
+		<script>
+//		if (window.DeviceMotionEvent) {
+//		  	window.addEventListener('devicemotion', deviceMotionHandler, false);
+//		} else {
+//			document.getElementById("dmEvent").innerHTML = "Not supported on your device."
+//		}
+//		
+//		window.addEventListener('devicemotion', deviceMotionHandler, true);
+//		function deviceMotionHandler(evt){
+//		   if(evt.accelerationIncludingGravity){
+//		       document.body.innerHTML = 
+//		          "x轴加速度: " + evt.accelerationIncludingGravity.x + "<br>"
+//		        + "y轴加速度: " + evt.accelerationIncludingGravity.y + "<br>"
+//		        + "z轴加速度: " + evt.accelerationIncludingGravity.z + "<br>"
+//		        +"ang"+Math.atan2(0 - evt.accelerationIncludingGravity.x ,evt.accelerationIncludingGravity.y).toFixed(2) / Math.PI * 180 +"<br>"
+//		    }
+//		    if(evt.rotationRate ){
+//		       document.body.innerHTML +=  
+//		         "x轴扭转: " + evt.rotationRate.beta + "<br>" 
+//		       + "y轴扭转: " + evt.rotationRate.gamma + "<br>"
+//		       + "z轴扭转: " + evt.rotationRate.alpha + "<br>"
+//		    }
+//		}
+		var ws = new WebSocket("ws://192.168.1.107:1235");
+		function orientationHandler(event) {  
+            document.getElementById("alpha").innerHTML = event.alpha;  
+            document.getElementById("beta").innerHTML = event.beta;  
+            document.getElementById("gamma").innerHTML = event.gamma;  
+            document.getElementById("heading").innerHTML = event.webkitCompassHeading;  
+            document.getElementById("accuracy").innerHTML = event.webkitCompassAccuracy;
+            var msg = {
+            	alpha: event.gamma,
+                beta: event.beta
+            };
+            ws.send(JSON.stringify(msg));
+        }  
+          
+        if (window.DeviceOrientationEvent) {  
+          window.addEventListener("deviceorientation", orientationHandler, false);  
+        } else {  
+          document.body.innerHTML = "What user agent u r using???";  
+        }  
+		</script>
+	</body>
+</html>

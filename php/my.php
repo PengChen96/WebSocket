@@ -42,11 +42,11 @@ while(true){
             //解码发送过来的数据
             $received_text = unmask($buf); 
             $tst_msg = json_decode($received_text);  
-            $user_name = $tst_msg->name; 
-            $user_message = $tst_msg->message; 
+            $alpha = $tst_msg->alpha; 
+            $beta = $tst_msg->beta; 
             
             //把消息发送回所有连接的 client 上去
-            $msg = mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message)));
+            $msg = mask(json_encode(array('type'=>'usermsg', 'alpha'=>$alpha, 'beta'=>$beta)));
 //			send_message($msg);
 //			global $socket_list;
 		    foreach($socket_list as $changed_socket)

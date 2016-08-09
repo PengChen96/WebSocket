@@ -35,6 +35,13 @@
 				mouseZ = 0;
 			//初始化
 			init();
+			var ws = new WebSocket("ws://192.168.1.107:1235");
+			ws.onmessage = function(e){
+				var msg = JSON.parse(e.data);
+				α = (msg.alpha/180)*3.14;
+                β = (msg.beta/180)*3.14;
+                console.log(α+"--"+β);
+			}
 			function init_renderer() {
 				container = document.getElementById("container")
 				width = document.getElementById("container").clientWidth;

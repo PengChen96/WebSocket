@@ -13,15 +13,15 @@
 			};
 			ws.onmessage = function(e){
 				console.log("message");
-				alert(e.data);
+//				alert(e.data);
 			}
 			ws.onerror = function(){
 			    console.log("error");
 			};
 			function send(){
                 var msg = {
-                    message: "mess",
-                    name: "name"
+                    alpha: "alpha",
+                    beta: "beta"
                 };
                 try{  
                     ws.send(JSON.stringify(msg)); 
